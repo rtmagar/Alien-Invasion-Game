@@ -77,6 +77,8 @@ class AlienInvasion:
 			# Reset the game statistics
 			self._start_game()
 			self.sb.prep_score()
+			self.sb.prep_level()
+			self.sb.prep_ships()
 
 			# Get rid of any remaining aliens and bullets.
 			self.aliens.empty()
@@ -210,12 +212,17 @@ class AlienInvasion:
 			for alien in collisions.values():
 				self.stats.score += self.settings.alien_points * len(alien)
 			self.sb.prep_score()
+			self.sb.check_high_score()
 
 		if not self.aliens:
 			# Destroy existing bullets and create new fleet.
 			self.bullets.empty()
 			self._create_fleet()
 			self.settings.increase_speed()
+
+			# Increase level.
+			self.stats.level += 1
+			self.sb.prep_level()
 
 	def _update_aliens(self):
 		"""Check if the fleet is at an edge, then update the positions of all aliens in the fleet."""
@@ -234,8 +241,9 @@ class AlienInvasion:
 		"""Respond to the ship being hit by an alien"""
 		
 		if self.stats.ships_left > 0:
-			# Decrement ships left.
+			# Decrement ships left and update scoreboard.
 			self.stats.ships_left -= 1
+			self.sb.prep_ships()
 
 			# Get rid of any remaining aliens and bullets.
 			self.aliens.empty()
